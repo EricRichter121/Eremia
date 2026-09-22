@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from eremia.core.config import settings
+from backend.core.config import settings
 
 
 engine = create_async_engine(

@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from eremia.database.base import Base
+from backend.database.base import Base
 
 if TYPE_CHECKING:
-    from eremia.astronomical_objects.models import AstronomicalObject
+    from backend.astronomical_objects.models import AstronomicalObject
 
 
 class ObjectType(Base):

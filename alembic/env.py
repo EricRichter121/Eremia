@@ -5,12 +5,12 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from eremia.database.base import Base
-from eremia.database import models
+from backend.database.base import Base
+from backend.database import models
 
 from alembic import context
 
-from eremia.core.config import settings
+from backend.core.config import settings
 
 target_metadata = Base.metadata
 

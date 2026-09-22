@@ -1,8 +1,6 @@
-from datetime import datetime
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
-from pydantic import BaseModel, ConfigDict, Field
-
-from eremia.object_types.schemas import ObjectTypeRead
+from backend.object_types.schemas import ObjectTypeRead
 
 
 # Shared fields for astronomical object payloads used in create/update flows.
@@ -12,11 +10,11 @@ class AstronomicalObjectBase(BaseModel):
     # Optional catalog identifier, such as a known astronomical designation.
     catalog_id: str | None = Field(default=None, max_length=100)
     # Identifier of the object type, e.g. star, planet, galaxy, etc.
-    object_type_id: int
+    object_type_id: int = Field(gt=0)
     # Optional summary or description of the object.
     description: str | None = None
     # Date when the object was discovered, if known.
-    discovered_at: datetime | None = None
+    discovered_at: AwareDatetime | None = None
 
 
 # Payload for creating a new astronomical object. It reuses the base fields.
@@ -31,6 +29,6 @@ class AstronomicalObjectRead(AstronomicalObjectBase):
 
     # Database primary key and creation timestamp.
     id: int
-    created_at: datetime
+    # created_at: datetime
     # Nested object type information included in API responses.
     object_type: ObjectTypeRead

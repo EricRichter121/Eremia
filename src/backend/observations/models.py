@@ -1,13 +1,14 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Numeric, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from eremia.database.base import Base
+from backend.database.base import Base
 
 if TYPE_CHECKING:
-    from eremia.astronomical_objects.models import AstronomicalObject
+    from backend.astronomical_objects.models import AstronomicalObject
 
 
 class ObservationLog(Base):
@@ -26,9 +27,9 @@ class ObservationLog(Base):
     # The observatory or observing facility is optional.
     observatory: Mapped[str | None] = mapped_column(Text)
     # Apparent brightness, stored with up to four decimal places.
-    magnitude: Mapped[float | None] = mapped_column(Numeric(10, 4))
+    magnitude: Mapped[Decimal | None] = mapped_column(Numeric(10, 4))
     # Distance from Earth in astronomical units, stored with six decimals.
-    distance_au: Mapped[float | None] = mapped_column(Numeric(16, 6))
+    distance_au: Mapped[Decimal | None] = mapped_column(Numeric(16, 6))
     # Free-form notes about the observation.
     notes: Mapped[str | None] = mapped_column(Text)
     # The database sets this timestamp when the observation row is inserted.

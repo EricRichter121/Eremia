@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING
 from sqlalchemy import DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from eremia.database.base import Base
+from backend.database.base import Base
 
 if TYPE_CHECKING:
-    from eremia.observations.models import ObservationLog
-    from eremia.object_types.models import ObjectType
+    from backend.observations.models import ObservationLog
+    from backend.object_types.models import ObjectType
 
 
 class AstronomicalObject(Base):

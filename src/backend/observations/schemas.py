@@ -1,12 +1,11 @@
-from datetime import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
 
 class ObservationLogBase(BaseModel):
-    astronomical_object_id: int
-    observed_at: datetime
+    astronomical_object_id: int = Field(gt=0)
+    observed_at: AwareDatetime
     observatory: str | None = None
     magnitude: Decimal | None = Field(default=None, max_digits=10, decimal_places=4)
     distance_au: Decimal | None = Field(default=None, max_digits=16, decimal_places=6)
