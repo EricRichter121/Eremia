@@ -1,10 +1,20 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.astronomical_objects.routes import router as astronomical_objects_router
 from backend.object_types.routes import router as object_types_router
 from backend.observations.routes import router as observations_router
 
 app = FastAPI()
+    
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://eremia-sigma.vercel.app"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(prefix="/api", router=astronomical_objects_router)
 app.include_router(prefix="/api", router=object_types_router)
