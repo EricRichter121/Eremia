@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
+
 import type { AstronomicalObject } from '../types/astronomicalObject'
 
 async function fetchAstronomicalObjects(): Promise<AstronomicalObject[]> {
   const response = await axios.get<AstronomicalObject[]>(
-    '/api/astronomical-objects',
+    `${import.meta.env.VITE_API_URL}/api/astronomical-objects`,
   )
+
   return response.data
 }
 
