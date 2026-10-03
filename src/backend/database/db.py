@@ -3,12 +3,15 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
+import ssl
 
 from backend.core.config import settings
 
+ssl_context = ssl.create_default_context()
 
 engine = create_async_engine(
     settings.database_url,
+    connect_args={"ssl": ssl_context},
     echo=True,
 )
 
