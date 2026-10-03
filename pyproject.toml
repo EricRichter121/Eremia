@@ -26,7 +26,7 @@ eremia = "eremia:main"
 requires = ["uv_build>=0.12.15,<0.13.0"]
 build-backend = "uv_build"
 [tool.uv]
-package-root = "src/backend"
+package-root = ""
 
 [tool.uv.build-backend]
 module-name = "backend"
