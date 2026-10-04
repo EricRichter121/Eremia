@@ -149,8 +149,10 @@ Example:
 
 ```env
 DATABASE_URL=postgresql+asyncpg://user:password@host/database
+JWT_SECRET=<generate-a-random-secret>
 ```
 
+Generate `JWT_SECRET` with `python -c "import secrets; print(secrets.token_urlsafe(32))"`.
 Sensitive credentials should not be committed to the repository.
 
 ## Development
