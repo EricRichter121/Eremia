@@ -17,6 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# register routers
 app.include_router(prefix="/api", router=astronomical_objects_router)
 app.include_router(prefix="/api", router=object_types_router)
 app.include_router(prefix="/api", router=observations_router)
