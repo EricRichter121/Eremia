@@ -1,56 +1,148 @@
 # Eremia 🔭
 
-Eremia is a web application for storing, exploring, and managing information about astronomical objects.
+**Eremia** is a full-stack web application for exploring and managing structured information about astronomical objects.
 
-The project is being developed as a full-stack application with a Python backend and a React frontend. The current MVP focuses on a structured database of astronomical objects such as stars, planets, nebulae, and other celestial bodies.
+The project combines a Python/FastAPI backend, a React/TypeScript frontend, and a PostgreSQL database. It is being developed as both a practical full-stack project and a foundation for a larger astronomy-oriented information system.
+
+## Overview
+
+Eremia currently provides:
+
+* Astronomical object catalog
+* Data loaded from a PostgreSQL database through a REST API
+* User registration and authentication
+* Sign In / Sign Up / Sign Out functionality
+* Client-side SPA routing
+* Production frontend and backend deployments
+* Separation between frontend, backend, and database layers
+
+The application is actively under development, with the current focus on expanding the data model, user functionality, and astronomical object interface.
+
+## Architecture
+
+```text
+┌──────────────────────────┐
+│        React App         │
+│      TypeScript/Vite     │
+│                          │
+│  Pages / Components      │
+│  Routing / Auth / API    │
+└────────────┬─────────────┘
+             │ HTTPS
+             ▼
+┌──────────────────────────┐
+│       FastAPI API        │
+│                          │
+│  Authentication          │
+│  Astronomical Objects    │
+│  Business Logic          │
+└────────────┬─────────────┘
+             │ PostgreSQL
+             ▼
+┌──────────────────────────┐
+│     PostgreSQL / Neon    │
+│                          │
+│  Users                   │
+│  Astronomical Objects    │
+│  Related Data            │
+└──────────────────────────┘
+```
+
+### Production
+
+```text
+User
+ │
+ ▼
+Vercel
+Frontend
+ │
+ │ HTTPS API requests
+ ▼
+Render
+FastAPI Backend
+ │
+ ▼
+Neon
+PostgreSQL
+```
 
 ## Features
 
-* Browse astronomical objects stored in the database
-* View basic information about individual objects
-* REST API for working with astronomical objects
-* PostgreSQL database
-* Responsive web interface
-* Separate frontend and backend applications
-* Production deployment
+### Astronomical Objects
+
+The main part of Eremia is a catalog of astronomical objects.
+
+Objects are stored in PostgreSQL and accessed through the FastAPI REST API. The frontend retrieves the data from the backend and renders it through the React interface.
+
+The architecture is designed so that additional object types and astronomical parameters can be introduced without replacing the existing application structure.
+
+### Authentication
+
+Eremia includes user authentication functionality:
+
+* **Sign Up** — creation of a user account
+* **Sign In** — authentication of an existing user
+* **Sign Out** — ending the current authenticated session
+
+Authentication is integrated into the frontend rather than being implemented as an isolated demonstration feature.
+
+The authentication system is intended to provide the foundation for future user-specific functionality.
+
+### Client-Side Routing
+
+The frontend is implemented as a Single Page Application.
+
+Current application routes include the astronomical object catalog under:
+
+```text
+/objects
+```
+
+Navigation between application pages is handled on the client side.
+
+The production deployment is configured to correctly serve SPA routes when a page is opened or reloaded directly.
 
 ## Tech Stack
 
-### Backend
-
-* **Python** — primary backend language
-* **FastAPI** — web framework for building the REST API
-* **SQLAlchemy** — ORM and database interaction
-* **Alembic** — database migrations
-* **Pydantic** — data validation and serialization
-* **asyncpg** — asynchronous PostgreSQL driver
-* **PostgreSQL** — relational database
-* **Neon** — hosted PostgreSQL database
-* **Uvicorn** — ASGI server
-
 ### Frontend
 
-* **React** — frontend library
-* **TypeScript** — static typing
-* **Vite** — development environment and build tool
-* **Axios** — HTTP client
-* **TanStack Query** — server-state management
+* **React**
+* **TypeScript**
+* **Vite**
+* **Axios**
+* **TanStack Query**
+* Client-side SPA routing
+
+### Backend
+
+* **Python**
+* **FastAPI**
+* **SQLAlchemy**
+* **Pydantic**
+* **asyncpg**
+* **Alembic**
+* **Uvicorn**
+
+### Database
+
+* **PostgreSQL**
+* **Neon**
 
 ### Deployment
 
-* **Render** — backend deployment
-* **Vercel** — frontend deployment
-* **Neon** — production database
+* **Vercel** — frontend
+* **Render** — backend
+* **Neon** — PostgreSQL database
 
 ## Project Structure
 
 ```text
 eremia/
+│
 ├── backend/
 │   ├── src/
-│   │   └── eremia/
-│   │       ├── ...
-│   │       └── main.py
+│   │   └── ...
 │   ├── alembic/
 │   ├── alembic.ini
 │   ├── pyproject.toml
@@ -61,49 +153,49 @@ eremia/
     │   ├── components/
     │   ├── hooks/
     │   ├── pages/
+    │   ├── stores/
     │   ├── types/
     │   └── ...
     ├── package.json
     └── ...
 ```
 
-The backend and frontend are maintained as separate applications and communicate through the REST API.
+The frontend and backend are maintained as separate applications with a clear API boundary between them.
 
 ## API
 
-The backend provides REST endpoints for astronomical objects.
+The backend exposes a REST API used by the frontend.
 
-Example:
+Astronomical object endpoints provide access to the data stored in PostgreSQL.
 
-```http
-GET /api/astronomical-objects
+Authentication-related endpoints provide user registration and authentication functionality.
+
+FastAPI's interactive API documentation is available during development at:
+
+```text
+http://localhost:8000/docs
 ```
-
-The endpoint returns astronomical objects stored in the PostgreSQL database.
-
-The API is designed to be extended as the project's data model grows.
 
 ## Database
 
 Eremia uses PostgreSQL as its primary relational database.
 
-The database is designed around separate entities rather than storing all astronomical object information in a single model. This allows the application to support additional object types and properties as the project evolves.
+SQLAlchemy is used for database interaction, while Alembic is responsible for schema migrations.
 
-Database schema changes are managed using Alembic migrations.
+The database contains both application data and user-related data, allowing the backend to support authenticated functionality alongside the astronomical object catalog.
 
-## Running Locally
+## Local Development
 
 ### Backend
 
-Create a virtual environment and install dependencies using `uv`.
+Install backend dependencies:
 
 ```bash
 cd backend
-
 uv sync
 ```
 
-Configure the required environment variables, including the PostgreSQL connection URL.
+Configure the required environment variables, including the PostgreSQL connection string.
 
 Start the development server:
 
@@ -117,7 +209,7 @@ The API will be available at:
 http://localhost:8000
 ```
 
-FastAPI also provides interactive API documentation at:
+Interactive API documentation:
 
 ```text
 http://localhost:8000/docs
@@ -129,7 +221,6 @@ Install dependencies:
 
 ```bash
 cd frontend
-
 npm install
 ```
 
@@ -139,45 +230,66 @@ Start the development server:
 npm run dev
 ```
 
-The frontend will be available at the local address provided by Vite.
+Vite will provide the local development URL in the terminal.
 
 ## Environment Variables
 
-The backend requires environment-specific configuration, including the PostgreSQL database connection.
+Environment-specific configuration is kept outside the source code.
 
-Example:
+A typical backend configuration includes a PostgreSQL connection URL:
 
 ```env
 DATABASE_URL=postgresql+asyncpg://user:password@host/database
-JWT_SECRET=<generate-a-random-secret>
 ```
 
-Generate `JWT_SECRET` with `python -c "import secrets; print(secrets.token_urlsafe(32))"`.
-Sensitive credentials should not be committed to the repository.
+Authentication and other application-specific configuration may require additional environment variables depending on the deployment configuration.
 
-## Development
+Sensitive credentials must not be committed to the repository.
 
-The project is currently focused on the MVP and its core functionality.
+## Development Status
 
-Possible future development includes:
+**Active development**
 
-* More astronomical object types
-* Additional physical and observational parameters
-* Search and filtering
-* Individual object pages
-* Improved navigation
-* More detailed astronomical data
+The current version already contains the core full-stack architecture:
+
+* React frontend
+* FastAPI backend
+* PostgreSQL database
+* Production API communication
+* Astronomical object catalog
+* User authentication
+* SPA routing
+* Production deployment
+
+The project is still evolving, and its architecture is intentionally being developed to accommodate more complex astronomical data and user functionality.
+
+## Planned Development
+
+Potential directions for future development include:
+
+* Detailed astronomical object pages
+* Advanced search and filtering
+* Additional astronomical object types
+* Expanded physical and observational parameters
+* User-specific functionality
+* More detailed relationships between astronomical entities
 * Integration with external astronomical databases and APIs
-* Authentication and user-specific functionality
+* Improved visualization of astronomical data
+* More advanced authentication and authorization
 
-## Status
+## Project Goals
 
-**MVP — in development**
+Eremia is intended to become more than a simple CRUD application.
 
-The current version has a working React frontend, FastAPI backend, PostgreSQL database, and production deployment.
+The long-term goal is to build a structured astronomical information system where different types of astronomical entities, their properties, and their relationships can be represented and explored through a web interface.
 
-Eremia is primarily a learning and portfolio project focused on full-stack development with Python and React while building a domain-specific application around astronomy.
+At the same time, the project serves as a practical full-stack development environment for working with:
 
-## License
-
-This project is currently not licensed for redistribution.
+* React and TypeScript
+* Python and FastAPI
+* asynchronous database access
+* REST API design
+* authentication
+* relational data modeling
+* cloud deployment
+* production web application architecture
