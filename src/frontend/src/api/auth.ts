@@ -23,6 +23,7 @@ export async function register(
 export async function signIn(
   credentials: SignInCredentials,
 ): Promise<void> {
+  // The JWT login endpoint expects form-encoded credentials, not JSON.
   const formData = new URLSearchParams({
     username: credentials.email,
     password: credentials.password,
@@ -44,6 +45,7 @@ export async function getCurrentUser(): Promise<User | null> {
     const response = await apiClient.get<User>('/users/me')
     return response.data
   } catch (error) {
+    // A 401 means there is no active session; other failures should reach callers.
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       return null
     }

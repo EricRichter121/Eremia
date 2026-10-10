@@ -7,6 +7,7 @@ import ssl
 
 from backend.core.config import settings
 
+# Use the platform trust store to verify the database server's TLS certificate.
 ssl_context = ssl.create_default_context()
 
 engine = create_async_engine(

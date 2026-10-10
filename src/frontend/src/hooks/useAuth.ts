@@ -27,6 +27,7 @@ export function useSignIn() {
 
   return useMutation({
     mutationFn: (credentials: SignInCredentials) => signIn(credentials),
+    // Refresh the cached user after the login cookie has been established.
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: currentUserQueryKey }),
   })
@@ -43,6 +44,7 @@ export function useSignOut() {
 
   return useMutation({
     mutationFn: signOut,
+    // Avoid showing the previously cached user after the session ends.
     onSuccess: () => {
       queryClient.setQueryData(currentUserQueryKey, null)
     },
