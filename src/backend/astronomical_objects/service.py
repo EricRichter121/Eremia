@@ -5,6 +5,7 @@ from sqlalchemy.orm import selectinload
 
 from backend.astronomical_objects.models import AstronomicalObject
 from backend.astronomical_objects.schemas import AstronomicalObjectCreate
+from backend.database.errors import IntegrityConflictError, integrity_constraint_name
 
 
 class AstronomicalObjectNotFoundError(Exception):
@@ -62,7 +63,9 @@ async def create(
 		await session.commit()
 	except IntegrityError as error:
 		await session.rollback()
-		raise DuplicateCatalogIdError from error
+		if integrity_constraint_name(error) == "astronomical_objects_catalog_id_key":
+			raise DuplicateCatalogIdError from error
+		raise IntegrityConflictError from error
 	return await get_by_id(session, astronomical_object.id)
 
 
@@ -78,7 +81,9 @@ async def update(
 		await session.commit()
 	except IntegrityError as error:
 		await session.rollback()
-		raise DuplicateCatalogIdError from error
+		if integrity_constraint_name(error) == "astronomical_objects_catalog_id_key":
+			raise DuplicateCatalogIdError from error
+		raise IntegrityConflictError from error
 	return await get_by_id(session, astronomical_object.id)
 
 
@@ -87,4 +92,8 @@ async def delete(
 ) -> None:
 	"""Delete an object and commit the relationship cascade."""
 	await session.delete(astronomical_object)
-	await session.commit()
+	try:
+		await session.commit()
+	except IntegrityError as error:
+		await session.rollback()
+		raise IntegrityConflictError from error

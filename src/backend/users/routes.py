@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from backend.users.auth import auth_backend, fastapi_users
+from backend.users.auth import auth_backend, current_active_user, fastapi_users
 from backend.users.models import User
 from backend.users.schemas import UserCreate, UserRead
 
@@ -16,9 +16,6 @@ router.include_router(
     prefix="/auth/jwt",
     tags=["auth"],
 )
-
-current_active_user = fastapi_users.current_user(active=True)
-
 
 @router.get("/users/me", response_model=UserRead, tags=["users"])
 async def read_current_user(

@@ -11,6 +11,8 @@ from backend.astronomical_objects.service import (
 	AstronomicalObjectNotFoundError,
 	DuplicateCatalogIdError,
 )
+from backend.database.errors import IntegrityConflictError
+from backend.users.auth import current_superuser
 
 
 router = APIRouter(prefix="/astronomical-objects", tags=["astronomical objects"])
@@ -49,6 +51,7 @@ async def read_astronomical_object(
 	"",
 	response_model=AstronomicalObjectRead,
 	status_code=status.HTTP_201_CREATED,
+	dependencies=[Depends(current_superuser)],
 )
 async def create_astronomical_object(
 	payload: AstronomicalObjectCreate,
@@ -67,9 +70,18 @@ async def create_astronomical_object(
 			status_code=status.HTTP_409_CONFLICT,
 			detail="An astronomical object with this catalog_id already exists",
 		) from error
+	except IntegrityConflictError as error:
+		raise HTTPException(
+			status_code=status.HTTP_409_CONFLICT,
+			detail="The operation conflicts with existing database records",
+		) from error
 
 
-@router.put("/{object_id}", response_model=AstronomicalObjectRead)
+@router.put(
+	"/{object_id}",
+	response_model=AstronomicalObjectRead,
+	dependencies=[Depends(current_superuser)],
+)
 async def replace_astronomical_object(
 	object_id: int,
 	payload: AstronomicalObjectCreate,
@@ -95,9 +107,18 @@ async def replace_astronomical_object(
 			status_code=status.HTTP_409_CONFLICT,
 			detail="An astronomical object with this catalog_id already exists",
 		) from error
+	except IntegrityConflictError as error:
+		raise HTTPException(
+			status_code=status.HTTP_409_CONFLICT,
+			detail="The operation conflicts with existing database records",
+		) from error
 
 
-@router.delete("/{object_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+	"/{object_id}",
+	status_code=status.HTTP_204_NO_CONTENT,
+	dependencies=[Depends(current_superuser)],
+)
 async def delete_astronomical_object(
 	object_id: int, session: AsyncSession = Depends(get_db_session)
 ):
@@ -108,4 +129,9 @@ async def delete_astronomical_object(
 		raise HTTPException(
 			status_code=status.HTTP_404_NOT_FOUND,
 			detail="Astronomical object not found",
+		) from error
+	except IntegrityConflictError as error:
+		raise HTTPException(
+			status_code=status.HTTP_409_CONFLICT,
+			detail="The operation conflicts with existing database records",
 		) from error

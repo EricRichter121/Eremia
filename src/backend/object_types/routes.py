@@ -8,6 +8,8 @@ from backend.object_types.service import (
 	DuplicateObjectTypeNameError,
 	ObjectTypeNotFoundError,
 )
+from backend.database.errors import IntegrityConflictError
+from backend.users.auth import current_superuser
 
 
 router = APIRouter(prefix="/object-types", tags=["object types"])
@@ -40,6 +42,7 @@ async def read_object_type(
 	"",
 	response_model=ObjectTypeRead,
 	status_code=status.HTTP_201_CREATED,
+	dependencies=[Depends(current_superuser)],
 )
 async def create_object_type(
 	payload: ObjectTypeCreate,
@@ -53,9 +56,18 @@ async def create_object_type(
 			status_code=status.HTTP_409_CONFLICT,
 			detail="An object type with this name already exists",
 		) from error
+	except IntegrityConflictError as error:
+		raise HTTPException(
+			status_code=status.HTTP_409_CONFLICT,
+			detail="The operation conflicts with existing database records",
+		) from error
 
 
-@router.put("/{object_type_id}", response_model=ObjectTypeRead)
+@router.put(
+	"/{object_type_id}",
+	response_model=ObjectTypeRead,
+	dependencies=[Depends(current_superuser)],
+)
 async def replace_object_type(
 	object_type_id: int,
 	payload: ObjectTypeCreate,
@@ -76,9 +88,18 @@ async def replace_object_type(
 			status_code=status.HTTP_409_CONFLICT,
 			detail="An object type with this name already exists",
 		) from error
+	except IntegrityConflictError as error:
+		raise HTTPException(
+			status_code=status.HTTP_409_CONFLICT,
+			detail="The operation conflicts with existing database records",
+		) from error
 
 
-@router.delete("/{object_type_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+	"/{object_type_id}",
+	status_code=status.HTTP_204_NO_CONTENT,
+	dependencies=[Depends(current_superuser)],
+)
 async def delete_object_type(
 	object_type_id: int,
 	session: AsyncSession = Depends(get_db_session),
@@ -90,4 +111,9 @@ async def delete_object_type(
 		raise HTTPException(
 			status_code=status.HTTP_404_NOT_FOUND,
 			detail="Object type not found",
+		) from error
+	except IntegrityConflictError as error:
+		raise HTTPException(
+			status_code=status.HTTP_409_CONFLICT,
+			detail="The operation conflicts with existing database records",
 		) from error

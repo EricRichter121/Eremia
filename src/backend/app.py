@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.astronomical_objects.routes import router as astronomical_objects_router
+from backend.favorites.routes import router as favorites_router
 from backend.object_types.routes import router as object_types_router
 from backend.observations.routes import router as observations_router
 from backend.users.routes import router as users_router
@@ -19,6 +20,7 @@ app.add_middleware(
 
 # register routers
 app.include_router(prefix="/api", router=astronomical_objects_router)
+app.include_router(prefix="/api", router=favorites_router)
 app.include_router(prefix="/api", router=object_types_router)
 app.include_router(prefix="/api", router=observations_router)
 app.include_router(prefix="/api", router=users_router)
