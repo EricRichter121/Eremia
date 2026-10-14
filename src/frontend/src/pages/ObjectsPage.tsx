@@ -1,15 +1,33 @@
+import AstronomicalObjectCard from '../components/AstronomicalObjectCard'
+import {
+  getFavoriteErrorMessage,
+  useFavoriteMutations,
+  useFavorites,
+} from '../hooks/useFavorites'
 import { useAstronomicalObjects } from '../hooks/useAstronomicalObjects'
 
-function formatDiscoveryDate(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeZone: 'UTC',
-  }).format(new Date(value))
+interface ObjectsPageProps {
+  onRequestSignIn: () => void
 }
 
-function ObjectsPage() {
+function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
   const { data: objects, error, isError, isPending, refetch } =
     useAstronomicalObjects()
+  const {
+    data: favorites,
+    error: favoritesError,
+    isError: isFavoritesError,
+    isPending: isFavoritesPending,
+    user,
+    isUserPending,
+    isUserError,
+    refetch: refetchFavorites,
+    refetchUser,
+  } = useFavorites()
+  const mutations = useFavoriteMutations()
+  const favoriteObjectIds = new Set(
+    favorites?.map((favorite) => favorite.astronomical_object.id) ?? [],
+  )
 
   return (
     <>
@@ -56,27 +74,63 @@ function ObjectsPage() {
         {!isPending && !isError && objects && objects.length > 0 && (
           <div className="object-grid" aria-label="Astronomical objects">
             {objects.map((object) => (
-              <article className="object-card" key={object.id}>
-                <p className="object-card__type">{object.object_type.name}</p>
-                <h2>{object.name}</h2>
-                <p className="object-card__catalog-id">
-                  {object.catalog_id ?? 'No catalog identifier'}
-                </p>
-                <p
-                  className={`object-card__description${object.description ? '' : ' object-card__description--empty'}`}
-                >
-                  {object.description || 'No description available.'}
-                </p>
-                <div className="object-card__footer">
-                  <span className="object-card__label">Discovered</span>
-                  <span className="object-card__date">
-                    {object.discovered_at
-                      ? formatDiscoveryDate(object.discovered_at)
-                      : 'Unknown'}
-                  </span>
-                </div>
-              </article>
+              <AstronomicalObjectCard
+                key={object.id}
+                object={object}
+                isFavorite={favoriteObjectIds.has(object.id)}
+                canManageFavorites={Boolean(user)}
+                favoritesLoading={
+                  Boolean(user) && (isFavoritesPending || isUserPending)
+                }
+                mutationPending={mutations.isPending}
+                onAddFavorite={mutations.addFavorite}
+                onRemoveFavorite={mutations.removeFavorite}
+                onRequestSignIn={onRequestSignIn}
+              />
             ))}
+          </div>
+        )}
+
+        {isUserError && (
+          <div className="catalog-message catalog-message--error" role="status">
+            <p>Account status is unavailable. Sign in again to manage favorites.</p>
+            <button
+              className="retry-button"
+              type="button"
+              onClick={() => void refetchUser()}
+            >
+              Retry account status
+            </button>
+          </div>
+        )}
+
+        {user && isFavoritesError && (
+          <div className="catalog-message catalog-message--error" role="alert">
+            <p>
+              {favoritesError instanceof Error
+                ? favoritesError.message
+                : 'Favorite status could not be loaded.'}
+            </p>
+            <button
+              className="retry-button"
+              type="button"
+              onClick={() => void refetchFavorites()}
+            >
+              Retry favorite status
+            </button>
+          </div>
+        )}
+
+        {mutations.error && user && (
+          <div className="catalog-message catalog-message--error" role="alert">
+            <p>{getFavoriteErrorMessage(mutations.error)}</p>
+            <button
+              className="retry-button"
+              type="button"
+              onClick={mutations.resetError}
+            >
+              Dismiss
+            </button>
           </div>
         )}
       </main>

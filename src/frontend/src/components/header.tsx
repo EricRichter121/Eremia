@@ -1,10 +1,14 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useCurrentUser, useSignOut } from '../hooks/useAuth'
-import SignInModal from './auth/SignInModal'
 import SignUpModal from './auth/SignUpModal'
 
-function Header() {
-  const [activeAuthModal, setActiveAuthModal] = useState<'sign-in' | 'sign-up' | null>(null)
+interface HeaderProps {
+  onRequestSignIn: () => void
+}
+
+function Header({ onRequestSignIn }: HeaderProps) {
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false)
   const { data: user, isError, isPending } = useCurrentUser()
   const signOutMutation = useSignOut()
 
@@ -14,6 +18,12 @@ function Header() {
         <a className="wordmark" href="/objects" aria-label="Eremia catalog home">
           <span aria-hidden="true">E</span> EREMIA
         </a>
+        <nav className="site-header__navigation" aria-label="Main navigation">
+          <Link to="/objects">Catalog</Link>
+          {!isPending && !isError && user && (
+            <Link to="/favorites">Favorites</Link>
+          )}
+        </nav>
         <div className="site-header__auth" aria-busy={isPending}>
           {isPending && <span className="auth-status-space" aria-hidden="true" />}
 
@@ -28,14 +38,14 @@ function Header() {
               <button
                 className="auth-button"
                 type="button"
-                onClick={() => setActiveAuthModal('sign-in')}
+                onClick={onRequestSignIn}
               >
                 Sign In
               </button>
               <button
                 className="auth-button auth-button--primary"
                 type="button"
-                onClick={() => setActiveAuthModal('sign-up')}
+                onClick={() => setIsSignUpOpen(true)}
               >
                 Sign Up
               </button>
@@ -63,14 +73,13 @@ function Header() {
           )}
         </div>
       </div>
-      <SignInModal
-        isOpen={activeAuthModal === 'sign-in'}
-        onClose={() => setActiveAuthModal(null)}
-      />
       <SignUpModal
-        isOpen={activeAuthModal === 'sign-up'}
-        onClose={() => setActiveAuthModal(null)}
-        onSignIn={() => setActiveAuthModal('sign-in')}
+        isOpen={isSignUpOpen}
+        onClose={() => setIsSignUpOpen(false)}
+        onSignIn={() => {
+          setIsSignUpOpen(false)
+          onRequestSignIn()
+        }}
       />
     </header>
   )
