@@ -7,7 +7,7 @@ from backend.object_types.routes import router as object_types_router
 from backend.observations.routes import router as observations_router
 from backend.users.routes import router as users_router
 
-app = FastAPI()
+app = FastAPI(docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/openapi.json", title="Astronomical Objects API")
     
 # Add CORS middleware
 app.add_middleware(

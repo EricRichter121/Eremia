@@ -10,7 +10,6 @@ function App() {
     <Routes>
       <Route path="/objects" element={<ObjectsPage />} />
       <Route path="/" element={<Navigate to="/objects" replace />} />
-      {/* <Route path="*" element={<Navigate to="/objects" replace />} /> */}
     </Routes></>
   )
 }
