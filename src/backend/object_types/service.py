@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.database.errors import IntegrityConflictError, integrity_constraint_name
 from backend.object_types.models import ObjectType
 from backend.object_types.schemas import ObjectTypeCreate
 
@@ -38,7 +39,9 @@ async def create(
 		await session.commit()
 	except IntegrityError as error:
 		await session.rollback()
-		raise DuplicateObjectTypeNameError from error
+		if integrity_constraint_name(error) == "ix_object_types_name":
+			raise DuplicateObjectTypeNameError from error
+		raise IntegrityConflictError from error
 	return object_type
 
 
@@ -54,11 +57,17 @@ async def update(
 		await session.commit()
 	except IntegrityError as error:
 		await session.rollback()
-		raise DuplicateObjectTypeNameError from error
+		if integrity_constraint_name(error) == "ix_object_types_name":
+			raise DuplicateObjectTypeNameError from error
+		raise IntegrityConflictError from error
 	return object_type
 
 
 async def delete(session: AsyncSession, object_type: ObjectType) -> None:
 	"""Delete an object type and commit the transaction."""
 	await session.delete(object_type)
-	await session.commit()
+	try:
+		await session.commit()
+	except IntegrityError as error:
+		await session.rollback()
+		raise IntegrityConflictError from error
