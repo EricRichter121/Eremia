@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react'
+
 import AstronomicalObjectCard from '../components/AstronomicalObjectCard'
 import {
   getFavoriteErrorMessage,
@@ -11,6 +13,7 @@ interface ObjectsPageProps {
 }
 
 function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
+  const [searchTerm, setSearchTerm] = useState('')
   const { data: objects, error, isError, isPending, refetch } =
     useAstronomicalObjects()
   const {
@@ -28,6 +31,19 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
   const favoriteObjectIds = new Set(
     favorites?.map((favorite) => favorite.astronomical_object.id) ?? [],
   )
+  const filteredObjects = useMemo(() => {
+    const query = searchTerm.trim().toLocaleLowerCase()
+    if (!query) return objects ?? []
+
+    return (objects ?? []).filter((object) =>
+      [
+        object.name,
+        object.catalog_id,
+        object.object_type.name,
+        object.description,
+      ].some((value) => value?.toLocaleLowerCase().includes(query)),
+    )
+  }, [objects, searchTerm])
 
   return (
     <>
@@ -36,6 +52,9 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
           <div>
             <p className="eyebrow">Catalog</p>
             <h1>Astronomical objects</h1>
+            <p className="catalog__intro">
+              Explore the Eremia archive of cataloged objects and their recorded properties.
+            </p>
           </div>
           {!isPending && !isError && (
             <p className="catalog__count">
@@ -43,6 +62,30 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
             </p>
           )}
         </div>
+
+        {!isPending && !isError && objects && objects.length > 0 && (
+          <div className="catalog__toolbar">
+            <label className="catalog-search">
+              <span className="catalog-search__label">Search the archive</span>
+              <span className="catalog-search__control">
+                <input
+                  className="catalog-search__input"
+                  type="search"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  placeholder="Name, identifier, type, or description"
+                />
+              </span>
+              <span className="catalog-search__hint">
+                Search across the records currently in the catalog.
+              </span>
+            </label>
+            <p className="catalog__count" aria-live="polite">
+              {filteredObjects.length} matching{' '}
+              {filteredObjects.length === 1 ? 'record' : 'records'}
+            </p>
+          </div>
+        )}
 
         {isPending && (
           <div className="catalog-message" role="status">
@@ -71,9 +114,16 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
           </div>
         )}
 
-        {!isPending && !isError && objects && objects.length > 0 && (
+        {!isPending && !isError && objects && objects.length > 0 && filteredObjects.length === 0 && (
+          <div className="catalog-message">
+            <h2>No matching records</h2>
+            <p>Try another name, identifier, object type, or description.</p>
+          </div>
+        )}
+
+        {!isPending && !isError && objects && filteredObjects.length > 0 && (
           <div className="object-grid" aria-label="Astronomical objects">
-            {objects.map((object) => (
+            {filteredObjects.map((object) => (
               <AstronomicalObjectCard
                 key={object.id}
                 object={object}

@@ -1,17 +1,39 @@
 :root {
-  font-family: 'Avenir Next', Avenir, 'Segoe UI', sans-serif;
-  color: #344344;
-  background: #f5f7f4;
+  font-family: Inter, 'Avenir Next', Avenir, 'Segoe UI', sans-serif;
+  color: var(--color-text-primary, #E7EDF5);
+  background: var(--color-background, #090D14);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --ink: #203333;
-  --text: #344344;
-  --muted: #788481;
-  --line: #dce3de;
-  --surface: #fff;
-  --accent: #a64f35;
+  --color-background: #090D14;
+  --color-surface: #111824;
+  --color-surface-elevated: #192333;
+  --color-text-primary: #E7EDF5;
+  --color-text-secondary: #8A96A8;
+  --color-accent-primary: #8AB4D8;
+  --color-accent-secondary: #9B9BCB;
+  --color-border: #263244;
+  --color-success: #82B79A;
+  --color-warning: #D2B175;
+  --color-error: #D98A8A;
+  --color-focus: #8AB4D8;
+  --shape-small: 0px;
+  --shape-medium: 0px;
+  --shape-large: 0px;
+  --shape-button: 0px;
+  --shape-input: 0px;
+  --shape-card: 0px;
+  --shape-dialog: 0px;
+  --shape-control: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --transition-interactive: 140ms ease;
 }
 
 #root {
@@ -23,9 +45,43 @@
 }
 
 body {
+  min-width: 320px;
   margin: 0;
+  background: var(--color-background);
+  color: var(--color-text-primary);
 }
 
-button {
-  font-family: inherit;
+button,
+input {
+  font: inherit;
+}
+
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--color-accent-primary);
+  color: var(--color-background);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

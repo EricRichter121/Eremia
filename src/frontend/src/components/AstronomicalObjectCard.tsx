@@ -32,22 +32,28 @@ function AstronomicalObjectCard({
     <article className="object-card">
       <p className="object-card__type">{object.object_type.name}</p>
       <h2>{object.name}</h2>
-      <p className="object-card__catalog-id">
-        {object.catalog_id ?? 'No catalog identifier'}
+      <p className="object-card__catalog-id" aria-label="Catalog identifier">
+        {object.catalog_id ?? 'Identifier unavailable'}
       </p>
       <p
         className={`object-card__description${object.description ? '' : ' object-card__description--empty'}`}
       >
         {object.description || 'No description available.'}
       </p>
-      <div className="object-card__footer">
-        <span className="object-card__label">Discovered</span>
-        <span className="object-card__date">
-          {object.discovered_at
-            ? formatDiscoveryDate(object.discovered_at)
-            : 'Unknown'}
-        </span>
-      </div>
+      <dl className="object-card__metadata">
+        <div>
+          <dt className="object-card__label">Record ID</dt>
+          <dd className="object-card__date">{object.id}</dd>
+        </div>
+        <div>
+          <dt className="object-card__label">Discovered</dt>
+          <dd className="object-card__date">
+            {object.discovered_at
+              ? formatDiscoveryDate(object.discovered_at)
+              : 'Unknown'}
+          </dd>
+        </div>
+      </dl>
       <div className="object-card__actions">
         <button
           className={`favorite-button${isFavorite ? ' favorite-button--active' : ''}`}
