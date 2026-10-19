@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import type { AstronomicalObject } from '../types/astronomicalObject'
 
 interface AstronomicalObjectCardProps {
@@ -31,7 +33,9 @@ function AstronomicalObjectCard({
   return (
     <article className="object-card">
       <p className="object-card__type">{object.object_type.name}</p>
-      <h2>{object.name}</h2>
+      <h2>
+        <Link to={`/objects/${object.id}`}>{object.name}</Link>
+      </h2>
       <p className="object-card__catalog-id" aria-label="Catalog identifier">
         {object.catalog_id ?? 'Identifier unavailable'}
       </p>
@@ -55,6 +59,9 @@ function AstronomicalObjectCard({
         </div>
       </dl>
       <div className="object-card__actions">
+        <Link className="object-card__details-link" to={`/objects/${object.id}`}>
+          View details
+        </Link>
         <button
           className={`favorite-button${isFavorite ? ' favorite-button--active' : ''}`}
           type="button"
