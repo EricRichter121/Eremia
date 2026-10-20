@@ -1,295 +1,258 @@
 # Eremia 🔭
 
-**Eremia** is a full-stack web application for exploring and managing structured information about astronomical objects.
+**Eremia is a full-stack web application for exploring astronomical objects and their properties.**
 
-The project combines a Python/FastAPI backend, a React/TypeScript frontend, and a PostgreSQL database. It is being developed as both a practical full-stack project and a foundation for a larger astronomy-oriented information system.
-
-## Overview
-
-Eremia currently provides:
-
-* Astronomical object catalog
-* Data loaded from a PostgreSQL database through a REST API
-* User registration and authentication
-* Sign In / Sign Up / Sign Out functionality
-* Client-side SPA routing
-* Production frontend and backend deployments
-* Separation between frontend, backend, and database layers
-
-The application is actively under development, with the current focus on expanding the data model, user functionality, and astronomical object interface.
-
-## Architecture
-
-```text
-┌──────────────────────────┐
-│        React App         │
-│      TypeScript/Vite     │
-│                          │
-│  Pages / Components      │
-│  Routing / Auth / API    │
-└────────────┬─────────────┘
-             │ HTTPS
-             ▼
-┌──────────────────────────┐
-│       FastAPI API        │
-│                          │
-│  Authentication          │
-│  Astronomical Objects    │
-│  Business Logic          │
-└────────────┬─────────────┘
-             │ PostgreSQL
-             ▼
-┌──────────────────────────┐
-│     PostgreSQL / Neon    │
-│                          │
-│  Users                   │
-│  Astronomical Objects    │
-│  Related Data            │
-└──────────────────────────┘
-```
-
-### Production
-
-```text
-User
- │
- ▼
-Vercel
-Frontend
- │
- │ HTTPS API requests
- ▼
-Render
-FastAPI Backend
- │
- ▼
-Neon
-PostgreSQL
-```
+The project combines a structured astronomical catalog with a modern web interface, user authentication, and personal collections. Its architecture is designed to support the gradual expansion of astronomical data models and the integration of additional object types and scientific datasets.
 
 ## Features
 
-### Astronomical Objects
+### Astronomical Catalog
+- Browse astronomical objects stored in a PostgreSQL database.
+- Search the catalog by object name, catalog identifier, object type, and description.
+- Open dedicated detail pages for individual objects.
+- Retrieve object data through a REST API.
 
-The main part of Eremia is a catalog of astronomical objects.
+### User Accounts
+- User registration and authentication.
+- Session-aware access to user-specific features.
+- Authenticated API requests.
 
-Objects are stored in PostgreSQL and accessed through the FastAPI REST API. The frontend retrieves the data from the backend and renders it through the React interface.
+### Favorites
+- Add astronomical objects to a personal favorites collection.
+- Remove objects from favorites.
+- View saved objects on a dedicated page.
+- Persist favorites in the database, associated with individual users.
 
-The architecture is designed so that additional object types and astronomical parameters can be introduced without replacing the existing application structure.
-
-### Authentication
-
-Eremia includes user authentication functionality:
-
-* **Sign Up** — creation of a user account
-* **Sign In** — authentication of an existing user
-* **Sign Out** — ending the current authenticated session
-
-Authentication is integrated into the frontend rather than being implemented as an isolated demonstration feature.
-
-The authentication system is intended to provide the foundation for future user-specific functionality.
-
-### Client-Side Routing
-
-The frontend is implemented as a Single Page Application.
-
-Current application routes include the astronomical object catalog under:
-
-```text
-/objects
-```
-
-Navigation between application pages is handled on the client side.
-
-The production deployment is configured to correctly serve SPA routes when a page is opened or reloaded directly.
+### User Interface
+- React single-page application with client-side routing.
+- Light and dark themes.
+- Persistent theme preferences.
+- Responsive, component-based interface.
 
 ## Tech Stack
 
-### Frontend
+| Layer | Technologies |
+| --- | --- |
+| Frontend | React, TypeScript, Vite |
+| Routing | React Router |
+| Data fetching and caching | TanStack Query |
+| HTTP client | Axios |
+| Backend | Python, FastAPI |
+| Data validation | Pydantic |
+| ORM | SQLAlchemy with asyncio support |
+| Database | PostgreSQL |
+| Database migrations | Alembic |
+| Database driver | asyncpg |
+| Authentication | FastAPI Users |
+| Frontend deployment | Vercel |
+| Backend deployment | Render |
+| Database hosting | Neon |
 
-* **React**
-* **TypeScript**
-* **Vite**
-* **Axios**
-* **TanStack Query**
-* Client-side SPA routing
+## Architecture
 
-### Backend
+Eremia separates the frontend, backend, and database into distinct layers.
 
-* **Python**
-* **FastAPI**
-* **SQLAlchemy**
-* **Pydantic**
-* **asyncpg**
-* **Alembic**
-* **Uvicorn**
+```text
+┌─────────────────────────────────┐
+│          React Frontend         │
+│                                 │
+│  Pages and Components           │
+│  React Router                   │
+│  TanStack Query                 │
+│  Axios API Client               │
+│  Theme Management               │
+└────────────────┬────────────────┘
+                 │
+                 │ HTTP / JSON
+                 ▼
+┌─────────────────────────────────┐
+│           FastAPI API           │
+│                                 │
+│  REST Endpoints                 │
+│  Authentication                 │
+│  Astronomical Object Operations │
+│  Favorites                      │
+│  Request Validation             │
+└────────────────┬────────────────┘
+                 │
+                 │ SQLAlchemy
+                 ▼
+┌─────────────────────────────────┐
+│            PostgreSQL           │
+│                                 │
+│  Users                          │
+│  Astronomical Objects           │
+│  Favorites                      │
+│  Related Reference Data         │
+└─────────────────────────────────┘
+```
 
-### Database
-
-* **PostgreSQL**
-* **Neon**
-
-### Deployment
-
-* **Vercel** — frontend
-* **Render** — backend
-* **Neon** — PostgreSQL database
+The frontend communicates with the backend through an HTTP API. SQLAlchemy handles database access, while Alembic manages database schema migrations.
 
 ## Project Structure
 
 ```text
-eremia/
-│
-├── backend/
-│   ├── src/
+Eremia/
+├── src/
+│   ├── backend/
+│   │   ├── alembic/
 │   │   └── ...
-│   ├── alembic/
-│   ├── alembic.ini
-│   ├── pyproject.toml
-│   └── ...
+│   │
+│   └── frontend/
+│       ├── src/
+│       │   ├── components/
+│       │   │   └── auth/
+│       │   ├── hooks/
+│       │   ├── pages/
+│       │   ├── services/
+│       │   ├── stores/
+│       │   ├── themes/
+│       │   └── types/
+│       ├── package.json
+│       └── vite.config.ts
 │
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   ├── hooks/
-    │   ├── pages/
-    │   ├── stores/
-    │   ├── types/
-    │   └── ...
-    ├── package.json
-    └── ...
+├── pyproject.toml
+└── README.md
 ```
 
-The frontend and backend are maintained as separate applications with a clear API boundary between them.
+The backend and frontend have separate responsibilities and dependency management. The Python project configuration is maintained in the repository root, while the frontend application resides in `src/frontend/`.
+
+## Application Routes
+
+| Route | Description |
+| --- | --- |
+| `/objects` | Browse and search the astronomical catalog |
+| `/objects/:objectId` | View an individual astronomical object |
+| `/favorites` | View and manage saved objects |
+| `/` | Redirect to `/objects` |
+
+Favorites are associated with the authenticated user. Users must sign in to access their personal collection.
 
 ## API
 
-The backend exposes a REST API used by the frontend.
+The FastAPI backend exposes REST endpoints for astronomical objects, authentication, and favorites.
 
-Astronomical object endpoints provide access to the data stored in PostgreSQL.
+The API is responsible for validating requests, enforcing access control, and interacting with the database.
 
-Authentication-related endpoints provide user registration and authentication functionality.
+During local development, the Vite development server proxies requests under `/api` to the backend at `http://localhost:8000`.
 
-FastAPI's interactive API documentation is available during development at:
+FastAPI provides interactive API documentation at:
 
-```text
-http://localhost:8000/docs
-```
+- Swagger UI: `http://localhost:8000/docs`
+- OpenAPI schema: `http://localhost:8000/openapi.json`
 
-## Database
+## Getting Started
 
-Eremia uses PostgreSQL as its primary relational database.
+### Prerequisites
 
-SQLAlchemy is used for database interaction, while Alembic is responsible for schema migrations.
+Install the following tools before starting development:
 
-The database contains both application data and user-related data, allowing the backend to support authenticated functionality alongside the astronomical object catalog.
+- Python 3.14 or a compatible version satisfying `pyproject.toml`
+- [uv](https://docs.astral.sh/uv/)
+- Node.js and npm
+- PostgreSQL, either locally or through a hosted provider such as Neon
 
-## Local Development
-
-### Backend
-
-Install backend dependencies:
+### 1. Clone the Repository
 
 ```bash
-cd backend
+git clone https://github.com/EricRichter121/Eremia.git
+cd Eremia
+```
+
+### 2. Set Up the Backend
+
+Install the Python dependencies from the repository root:
+
+```bash
 uv sync
 ```
 
-Configure the required environment variables, including the PostgreSQL connection string.
+Configure the environment variables required by the backend, including the PostgreSQL connection URL.
 
-Start the development server:
-
-```bash
-uv run uvicorn eremia.main:app --reload
-```
-
-The API will be available at:
-
-```text
-http://localhost:8000
-```
-
-Interactive API documentation:
-
-```text
-http://localhost:8000/docs
-```
-
-### Frontend
-
-Install dependencies:
+Start the FastAPI application using the ASGI entry point configured in the project:
 
 ```bash
-cd frontend
+uv run uvicorn backend.main:app --reload
+```
+
+The exact ASGI import path must match the backend entry-point module in the checked-out version.
+
+The API should be available at `http://localhost:8000`.
+
+### 3. Set Up the Frontend
+
+Open a separate terminal and navigate to the frontend directory:
+
+```bash
+cd src/frontend
 npm install
-```
-
-Start the development server:
-
-```bash
 npm run dev
 ```
 
-Vite will provide the local development URL in the terminal.
+Vite will print the local development URL in the terminal.
 
-## Environment Variables
+### 4. Configure the Database
 
-Environment-specific configuration is kept outside the source code.
+Eremia uses PostgreSQL for application data. Configure the database connection before starting the backend.
 
-A typical backend configuration includes a PostgreSQL connection URL:
+A typical asynchronous SQLAlchemy connection URL has the following format:
 
-```env
-DATABASE_URL=postgresql+asyncpg://user:password@host/database
+```dotenv
+DATABASE_URL=postgresql+asyncpg://user:password@host:5432/database
 ```
 
-Authentication and other application-specific configuration may require additional environment variables depending on the deployment configuration.
+Use the actual environment variable names expected by the backend configuration. Keep database credentials and other secrets out of version control.
 
-Sensitive credentials must not be committed to the repository.
+### 5. Apply Database Migrations
+
+Run Alembic migrations using the repository's configured migration environment:
+
+```bash
+uv run alembic upgrade head
+```
+
+Ensure that the database connection is configured correctly before applying migrations.
+
+## Database Design
+
+The database stores astronomical objects and user-related information.
+
+The data model is designed to support relationships between users, astronomical objects, and saved favorites. Database migrations allow schema changes to be introduced incrementally as the project evolves.
+
+Future iterations can extend astronomical object records with additional physical, orbital, observational, and classification parameters.
+
+## Deployment
+
+The production architecture uses separate services for the frontend, backend, and database:
+
+- **Vercel** — frontend hosting.
+- **Render** — FastAPI backend hosting.
+- **Neon** — managed PostgreSQL database.
+
+Production deployments require the appropriate database connection settings, frontend API configuration, and authentication settings. Environment-specific secrets should be configured through the hosting providers rather than committed to the repository.
 
 ## Development Status
 
-**Active development**
+Eremia is under active development.
 
-The current version already contains the core full-stack architecture:
+The current application includes the core full-stack architecture, an astronomical object catalog, object detail pages, authentication, a favorites collection, and theme management.
 
-* React frontend
-* FastAPI backend
-* PostgreSQL database
-* Production API communication
-* Astronomical object catalog
-* User authentication
-* SPA routing
-* Production deployment
+The data model and interface are being expanded to accommodate more detailed astronomical information.
 
-The project is still evolving, and its architecture is intentionally being developed to accommodate more complex astronomical data and user functionality.
+## Roadmap
 
-## Planned Development
+Planned areas of development include:
 
-Potential directions for future development include:
-
-* Detailed astronomical object pages
-* Advanced search and filtering
-* Additional astronomical object types
-* Expanded physical and observational parameters
-* User-specific functionality
-* More detailed relationships between astronomical entities
-* Integration with external astronomical databases and APIs
-* Improved visualization of astronomical data
-* More advanced authentication and authorization
+- Expanding astronomical object models and physical parameters.
+- Supporting additional categories of astronomical objects.
+- Improving search and filtering capabilities.
+- Integrating external astronomical datasets and scientific APIs.
+- Adding richer object relationships and cross-references.
+- Improving the presentation of scientific and observational data.
+- Expanding automated testing and validation.
 
 ## Project Goals
 
-Eremia is intended to become more than a simple CRUD application.
+Eremia aims to evolve into a structured astronomical information system for discovering and exploring celestial objects, their properties, and their relationships.
 
-The long-term goal is to build a structured astronomical information system where different types of astronomical entities, their properties, and their relationships can be represented and explored through a web interface.
-
-At the same time, the project serves as a practical full-stack development environment for working with:
-
-* React and TypeScript
-* Python and FastAPI
-* asynchronous database access
-* REST API design
-* authentication
-* relational data modeling
-* cloud deployment
-* production web application architecture
+The project also serves as a practical full-stack development project focused on API design, relational data modeling, asynchronous database access, authentication, frontend state management, and production deployment.
