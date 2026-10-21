@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCurrentUser, useSignOut } from '../hooks/useAuth'
+import { useTheme } from '../themes/ThemeContext'
 import SignUpModal from './auth/SignUpModal'
 
 interface HeaderProps {
@@ -11,13 +12,15 @@ function Header({ onRequestSignIn }: HeaderProps) {
   const [isSignUpOpen, setIsSignUpOpen] = useState(false)
   const { data: user, isError, isPending } = useCurrentUser()
   const signOutMutation = useSignOut()
+  const { themeId, availableThemes, setTheme } = useTheme()
 
   return (
     <header className="site-header">
       <div className="site-header__inner">
-        <a className="wordmark" href="/objects" aria-label="Eremia catalog home">
-          <span aria-hidden="true">E</span> EREMIA
-        </a>
+        <Link className="wordmark" to="/objects" aria-label="Eremia catalog home">
+          <span className="wordmark__mark" aria-hidden="true">E</span>
+          EREMIA
+        </Link>
         <nav className="site-header__navigation" aria-label="Main navigation">
           <Link to="/objects">Catalog</Link>
           {!isPending && !isError && user && (
@@ -71,6 +74,37 @@ function Header({ onRequestSignIn }: HeaderProps) {
               Sign out failed
             </span>
           )}
+
+          <details className="theme-picker">
+            <summary
+              className="theme-picker__trigger"
+              aria-label={`Select theme. Current theme: ${availableThemes[themeId].name}`}
+            >
+              <span>{availableThemes[themeId].name}</span>
+              <span className="theme-picker__chevron" aria-hidden="true" />
+            </summary>
+            <div className="theme-picker__menu" aria-label="Available themes">
+              {Object.entries(availableThemes).map(([id, theme]) => (
+                <button
+                  key={id}
+                  className="theme-picker__option"
+                  type="button"
+                  aria-pressed={themeId === id}
+                  onClick={(event) => {
+                    setTheme(id)
+                    event.currentTarget.closest('details')?.removeAttribute('open')
+                  }}
+                >
+                  {theme.name}
+                  {themeId === id && (
+                    <span className="theme-picker__selected" aria-hidden="true">
+                      ✓
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </details>
         </div>
       </div>
       <SignUpModal
