@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.database.errors import IntegrityConflictError
 from backend.observations.models import ObservationLog
 from backend.observations.schemas import ObservationLogCreate
 
@@ -49,9 +50,9 @@ async def create(
 	session.add(observation)
 	try:
 		await session.commit()
-	except IntegrityError:
+	except IntegrityError as error:
 		await session.rollback()
-		raise
+		raise IntegrityConflictError from error
 	return observation
 
 
@@ -65,13 +66,17 @@ async def update(
 		setattr(observation, field, value)
 	try:
 		await session.commit()
-	except IntegrityError:
+	except IntegrityError as error:
 		await session.rollback()
-		raise
+		raise IntegrityConflictError from error
 	return observation
 
 
 async def delete(session: AsyncSession, observation: ObservationLog) -> None:
 	"""Delete an observation and commit the transaction."""
 	await session.delete(observation)
-	await session.commit()
+	try:
+		await session.commit()
+	except IntegrityError as error:
+		await session.rollback()
+		raise IntegrityConflictError from error

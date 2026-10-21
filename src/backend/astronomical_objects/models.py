@@ -9,6 +9,7 @@ from backend.database.base import Base
 if TYPE_CHECKING:
     from backend.observations.models import ObservationLog
     from backend.object_types.models import ObjectType
+    from backend.favorites.models import Favorite
 
 
 class AstronomicalObject(Base):
@@ -42,4 +43,9 @@ class AstronomicalObject(Base):
     # Deleting the object also deletes its observations.
     observations: Mapped[list["ObservationLog"]] = relationship(
         back_populates="astronomical_object", cascade="all, delete-orphan"
+    )
+    favorites: Mapped[list["Favorite"]] = relationship(
+        back_populates="astronomical_object",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )

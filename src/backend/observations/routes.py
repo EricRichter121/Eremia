@@ -5,6 +5,8 @@ from backend.api.dependencies import get_db_session
 from backend.observations import controller
 from backend.observations.schemas import ObservationLogCreate, ObservationLogRead
 from backend.observations.service import ObservationNotFoundError
+from backend.database.errors import IntegrityConflictError
+from backend.users.auth import current_superuser
 
 
 router = APIRouter(prefix="/observations", tags=["observations"])
@@ -42,6 +44,7 @@ async def read_observation(
 	"",
 	response_model=ObservationLogRead,
 	status_code=status.HTTP_201_CREATED,
+	dependencies=[Depends(current_superuser)],
 )
 async def create_observation(
 	payload: ObservationLogCreate,
@@ -55,9 +58,18 @@ async def create_observation(
 			status_code=status.HTTP_404_NOT_FOUND,
 			detail="Astronomical object not found",
 		) from error
+	except IntegrityConflictError as error:
+		raise HTTPException(
+			status_code=status.HTTP_409_CONFLICT,
+			detail="The operation conflicts with existing database records",
+		) from error
 
 
-@router.put("/{observation_id}", response_model=ObservationLogRead)
+@router.put(
+	"/{observation_id}",
+	response_model=ObservationLogRead,
+	dependencies=[Depends(current_superuser)],
+)
 async def replace_observation(
 	observation_id: int,
 	payload: ObservationLogCreate,
@@ -78,9 +90,18 @@ async def replace_observation(
 			status_code=status.HTTP_404_NOT_FOUND,
 			detail="Astronomical object not found",
 		) from error
+	except IntegrityConflictError as error:
+		raise HTTPException(
+			status_code=status.HTTP_409_CONFLICT,
+			detail="The operation conflicts with existing database records",
+		) from error
 
 
-@router.delete("/{observation_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+	"/{observation_id}",
+	status_code=status.HTTP_204_NO_CONTENT,
+	dependencies=[Depends(current_superuser)],
+)
 async def delete_observation(
 	observation_id: int,
 	session: AsyncSession = Depends(get_db_session),
@@ -92,4 +113,9 @@ async def delete_observation(
 		raise HTTPException(
 			status_code=status.HTTP_404_NOT_FOUND,
 			detail="Observation not found",
+		) from error
+	except IntegrityConflictError as error:
+		raise HTTPException(
+			status_code=status.HTTP_409_CONFLICT,
+			detail="The operation conflicts with existing database records",
 		) from error

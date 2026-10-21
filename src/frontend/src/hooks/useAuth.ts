@@ -47,6 +47,7 @@ export function useSignOut() {
     // Avoid showing the previously cached user after the session ends.
     onSuccess: () => {
       queryClient.setQueryData(currentUserQueryKey, null)
+      queryClient.removeQueries({ queryKey: ['favorites'] })
     },
   })
 }
