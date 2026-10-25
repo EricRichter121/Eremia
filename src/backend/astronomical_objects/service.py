@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 from backend.astronomical_objects.models import AstronomicalObject
 from backend.astronomical_objects.schemas import AstronomicalObjectCreate
 from backend.database.errors import IntegrityConflictError, integrity_constraint_name
+from backend.planetary_parameters.models import PlanetaryParameters
 
 
 class AstronomicalObjectNotFoundError(Exception):
@@ -19,10 +20,13 @@ class DuplicateCatalogIdError(Exception):
 async def get_by_id(
 	session: AsyncSession, object_id: int
 ) -> AstronomicalObject:
-	"""Load an object with its type eagerly loaded for the response schema."""
+	"""Load an object with its type and planetary parameters for serialization."""
 	statement = (
 		select(AstronomicalObject)
-		.options(selectinload(AstronomicalObject.object_type))
+		.options(
+			selectinload(AstronomicalObject.object_type),
+			selectinload(AstronomicalObject.planetary_parameters),
+		)
 		.where(AstronomicalObject.id == object_id)
 	)
 	astronomical_object = await session.scalar(statement)
@@ -40,7 +44,10 @@ async def list_all(
 	"""Query objects in name order with optional type filtering and pagination."""
 	statement = (
 		select(AstronomicalObject)
-		.options(selectinload(AstronomicalObject.object_type))
+		.options(
+			selectinload(AstronomicalObject.object_type),
+			selectinload(AstronomicalObject.planetary_parameters),
+		)
 		.order_by(AstronomicalObject.name)
 		.offset(skip)
 		.limit(limit)
@@ -57,7 +64,12 @@ async def create(
 	session: AsyncSession, payload: AstronomicalObjectCreate
 ) -> AstronomicalObject:
 	"""Persist a new object and translate uniqueness failures into a domain error."""
-	astronomical_object = AstronomicalObject(**payload.model_dump())
+	object_fields = payload.model_dump(exclude={"planetary_parameters"})
+	astronomical_object = AstronomicalObject(**object_fields)
+	if payload.planetary_parameters is not None:
+		astronomical_object.planetary_parameters = PlanetaryParameters(
+			**payload.planetary_parameters.model_dump()
+		)
 	session.add(astronomical_object)
 	try:
 		await session.commit()
@@ -75,8 +87,15 @@ async def update(
 	payload: AstronomicalObjectCreate,
 ) -> AstronomicalObject:
 	"""Apply replacement fields, commit them, and reload the response object."""
-	for field, value in payload.model_dump().items():
+	for field, value in payload.model_dump(
+		exclude={"planetary_parameters"}
+	).items():
 		setattr(astronomical_object, field, value)
+	astronomical_object.planetary_parameters = (
+		PlanetaryParameters(**payload.planetary_parameters.model_dump())
+		if payload.planetary_parameters is not None
+		else None
+	)
 	try:
 		await session.commit()
 	except IntegrityError as error:

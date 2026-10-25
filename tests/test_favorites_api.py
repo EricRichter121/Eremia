@@ -1,5 +1,6 @@
 import unittest
 from datetime import datetime, timezone
+from decimal import Decimal
 from types import SimpleNamespace
 
 import httpx
@@ -13,6 +14,7 @@ from backend.database.base import Base
 from backend.favorites.models import Favorite
 from backend.favorites.routes import router as favorites_router
 from backend.object_types.models import ObjectType
+from backend.planetary_parameters.models import PlanetaryParameters
 from backend.users.auth import current_active_user
 
 
@@ -26,6 +28,10 @@ class FakeAsyncSession:
                 object_type_id=1,
                 description="A nearby galaxy",
                 object_type=ObjectType(id=1, name="Galaxy", description=None),
+                planetary_parameters=PlanetaryParameters(
+                    astronomical_object_id=7,
+                    mass_earth=Decimal("3.2"),
+                ),
             )
         }
         self.favorites: list[Favorite] = []
@@ -34,7 +40,7 @@ class FakeAsyncSession:
         self.next_favorite_id = 1
         self.fail_next_commit_with: str | None = None
 
-    async def get(self, model: type, object_id: int):
+    async def get(self, model: type, object_id: int, **kwargs):
         if model is AstronomicalObject:
             return self.objects.get(object_id)
         raise AssertionError(f"Unexpected model lookup: {model}")
@@ -170,6 +176,10 @@ class FavoritesApiTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()["astronomical_object"]["id"], 7)
         self.assertEqual(response.json()["astronomical_object"]["object_type"]["name"], "Galaxy")
+        self.assertEqual(
+            response.json()["astronomical_object"]["planetary_parameters"]["mass_earth"],
+            "3.2",
+        )
         self.assertEqual(self.session.favorites[0].user_id, self.user_id)
 
     async def test_create_favorite_for_missing_object_returns_404(self) -> None:
@@ -268,7 +278,9 @@ class FavoritesApiTests(unittest.IsolatedAsyncioTestCase):
 
     def test_favorite_model_preserves_database_constraints(self) -> None:
         self.assertIn("observation_logs", Base.metadata.tables)
+        self.assertIn("planetary_parameters", Base.metadata.tables)
         self.assertIsNotNone(models.ObservationLog)
+        self.assertIsNotNone(models.PlanetaryParameters)
         unique_constraints = [
             constraint
             for constraint in Favorite.__table__.constraints

@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from backend.observations.models import ObservationLog
     from backend.object_types.models import ObjectType
     from backend.favorites.models import Favorite
+    from backend.planetary_parameters.models import PlanetaryParameters
 
 
 class AstronomicalObject(Base):
@@ -48,4 +49,10 @@ class AstronomicalObject(Base):
         back_populates="astronomical_object",
         cascade="all, delete-orphan",
         passive_deletes=True,
+    )
+    planetary_parameters: Mapped["PlanetaryParameters | None"] = relationship(
+        back_populates="astronomical_object",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        uselist=False,
     )

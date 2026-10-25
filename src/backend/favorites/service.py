@@ -25,13 +25,16 @@ class DuplicateFavoriteError(Exception):
 async def list_for_user(
     session: AsyncSession, user_id: int
 ) -> list[Favorite]:
-    """Load a user's favorites with the nested object type ready for serialization."""
+    """Load favorites with nested object types and parameters for serialization."""
     statement = (
         select(Favorite)
         .options(
             selectinload(Favorite.astronomical_object).selectinload(
                 AstronomicalObject.object_type
-            )
+            ),
+            selectinload(Favorite.astronomical_object).selectinload(
+                AstronomicalObject.planetary_parameters
+            ),
         )
         .where(Favorite.user_id == user_id)
         .order_by(Favorite.created_at.desc(), Favorite.id.desc())
@@ -44,7 +47,14 @@ async def create(
     session: AsyncSession, user_id: int, object_id: int
 ) -> Favorite:
     """Create a favorite owned by the authenticated user."""
-    astronomical_object = await session.get(AstronomicalObject, object_id)
+    astronomical_object = await session.get(
+        AstronomicalObject,
+        object_id,
+        options=[
+            selectinload(AstronomicalObject.object_type),
+            selectinload(AstronomicalObject.planetary_parameters),
+        ],
+    )
     if astronomical_object is None:
         raise AstronomicalObjectNotFoundError
 
