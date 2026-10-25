@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import ObjectsPage from './pages/ObjectsPage'
 import FavoritesPage from './pages/FavoritesPage'
+import AstronomicalObjectPage from './pages/AstronomicalObjectPage'
 import Header from './components/header'
 import SignInModal from './components/auth/SignInModal'
 
@@ -17,6 +18,14 @@ function App() {
           path="/objects"
           element={
             <ObjectsPage onRequestSignIn={() => setIsSignInOpen(true)} />
+          }
+        />
+        <Route
+          path="/objects/:objectId"
+          element={
+            <AstronomicalObjectPage
+              onRequestSignIn={() => setIsSignInOpen(true)}
+            />
           }
         />
         <Route
