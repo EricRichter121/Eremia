@@ -1,4 +1,6 @@
 import type { AstronomicalObject } from '../types/astronomicalObject'
+import { Link } from 'react-router-dom'
+import FavoriteButton from './FavoriteButton'
 
 interface AstronomicalObjectCardProps {
   object: AstronomicalObject
@@ -31,7 +33,11 @@ function AstronomicalObjectCard({
   return (
     <article className="object-card">
       <p className="object-card__type">{object.object_type.name}</p>
-      <h2>{object.name}</h2>
+      <h2>
+        <Link className="object-card__title-link" to={`/objects/${object.id}`}>
+          {object.name}
+        </Link>
+      </h2>
       <p className="object-card__catalog-id" aria-label="Catalog identifier">
         {object.catalog_id ?? 'Identifier unavailable'}
       </p>
@@ -55,30 +61,18 @@ function AstronomicalObjectCard({
         </div>
       </dl>
       <div className="object-card__actions">
-        <button
-          className={`favorite-button${isFavorite ? ' favorite-button--active' : ''}`}
-          type="button"
-          aria-pressed={isFavorite}
-          disabled={canManageFavorites && (favoritesLoading || mutationPending)}
-          onClick={() => {
-            if (!canManageFavorites) {
-              onRequestSignIn()
-            } else if (isFavorite) {
-              onRemoveFavorite(object.id)
-            } else {
-              onAddFavorite(object.id)
-            }
-          }}
-        >
-          <span aria-hidden="true">{isFavorite ? '★' : '☆'}</span>
-          {favoritesLoading
-            ? 'Loading favorites…'
-            : isFavorite
-              ? 'Remove favorite'
-              : canManageFavorites
-                ? 'Add to favorites'
-                : 'Sign in to favorite'}
-        </button>
+        <Link className="object-card__details-link" to={`/objects/${object.id}`}>
+          View details
+        </Link>
+        <FavoriteButton
+          isFavorite={isFavorite}
+          canManageFavorites={canManageFavorites}
+          favoritesLoading={favoritesLoading}
+          mutationPending={mutationPending}
+          onAddFavorite={() => onAddFavorite(object.id)}
+          onRemoveFavorite={() => onRemoveFavorite(object.id)}
+          onRequestSignIn={onRequestSignIn}
+        />
       </div>
     </article>
   )
