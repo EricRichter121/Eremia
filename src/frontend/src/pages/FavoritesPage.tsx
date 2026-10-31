@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import AstronomicalObjectCard from '../components/AstronomicalObjectCard'
+import AstronomicalObjectCardSkeleton from '../components/AstronomicalObjectCardSkeleton'
 import {
   getFavoriteErrorMessage,
   useFavoriteMutations,
@@ -41,8 +42,14 @@ function FavoritesPage({ onRequestSignIn }: FavoritesPageProps) {
       </div>
 
       {(isUserPending || isPending) && (
-        <div className="catalog-message" role="status">
-          <p>Loading your favorites…</p>
+        <div
+          className="object-grid"
+          role="status"
+          aria-label="Loading your favorites"
+        >
+          {Array.from({ length: 6 }, (_, index) => (
+            <AstronomicalObjectCardSkeleton key={index} />
+          ))}
         </div>
       )}
 

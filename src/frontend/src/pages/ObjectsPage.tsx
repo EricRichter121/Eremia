@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import AstronomicalObjectCard from '../components/AstronomicalObjectCard'
+import AstronomicalObjectCardSkeleton from '../components/AstronomicalObjectCardSkeleton'
 import {
   getFavoriteErrorMessage,
   useFavoriteMutations,
@@ -88,8 +89,14 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
         )}
 
         {isPending && (
-          <div className="catalog-message" role="status">
-            <p>Loading astronomical objects...</p>
+          <div
+            className="object-grid"
+            role="status"
+            aria-label="Loading astronomical objects"
+          >
+            {Array.from({ length: 6 }, (_, index) => (
+              <AstronomicalObjectCardSkeleton key={index} />
+            ))}
           </div>
         )}
 

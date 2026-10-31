@@ -2,6 +2,7 @@ import axios from 'axios'
 import { useParams, Link } from 'react-router-dom'
 
 import FavoriteButton from '../components/FavoriteButton'
+import Skeleton from '../components/Skeleton'
 import {
   getFavoriteErrorMessage,
   useFavoriteMutations,
@@ -75,8 +76,54 @@ function AstronomicalObjectPage({
       </Link>
 
       {objectId !== undefined && isPending && (
-        <div className="catalog-message" role="status">
-          <p>Loading astronomical object...</p>
+        <div role="status" aria-label="Loading astronomical object">
+          <article className="object-detail object-detail--skeleton" aria-hidden="true">
+            <header className="object-detail__heading object-detail-skeleton__heading">
+              <div className="object-detail-skeleton__identity">
+                <Skeleton width="96px" height="10px" />
+                <Skeleton
+                  className="object-detail-skeleton__title"
+                  width="min(420px, 75%)"
+                  height="48px"
+                />
+                <Skeleton className="object-detail-skeleton__catalog-id" width="180px" height="12px" />
+              </div>
+              <Skeleton width="118px" height="36px" />
+            </header>
+
+            <section className="object-detail__section">
+              <Skeleton className="object-detail-skeleton__section-title" width="120px" height="25px" />
+              <div className="object-detail-skeleton__paragraph">
+                <Skeleton width="100%" height="10px" />
+                <Skeleton width="96%" height="10px" />
+                <Skeleton width="82%" height="10px" />
+              </div>
+            </section>
+
+            <section className="object-detail__section">
+              <Skeleton className="object-detail-skeleton__section-title" width="175px" height="25px" />
+              <div className="object-detail__metadata">
+                {Array.from({ length: 2 }, (_, index) => (
+                  <div key={index} className="object-detail-skeleton__metadata">
+                    <Skeleton width="72px" height="8px" />
+                    <Skeleton width="92px" height="10px" />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="object-detail__section">
+              <Skeleton className="object-detail-skeleton__section-title" width="205px" height="25px" />
+              <div className="object-detail__metadata">
+                {Array.from({ length: 8 }, (_, index) => (
+                  <div key={index} className="object-detail-skeleton__metadata">
+                    <Skeleton width="116px" height="8px" />
+                    <Skeleton width="84px" height="10px" />
+                  </div>
+                ))}
+              </div>
+            </section>
+          </article>
         </div>
       )}
 
