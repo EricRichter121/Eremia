@@ -25,8 +25,10 @@ class FakeAsyncSession:
                 catalog_id="M31",
                 object_type_id=1,
                 description="A nearby galaxy",
-                object_type=ObjectType(id=1, name="Galaxy", description=None),
             )
+        }
+        self.object_types = {
+            1: ObjectType(id=1, name="Galaxy", description=None)
         }
         self.favorites: list[Favorite] = []
         self.pending_favorites: list[Favorite] = []
@@ -34,9 +36,14 @@ class FakeAsyncSession:
         self.next_favorite_id = 1
         self.fail_next_commit_with: str | None = None
 
-    async def get(self, model: type, object_id: int):
+    async def get(self, model: type, object_id: int, *, options=()):
         if model is AstronomicalObject:
-            return self.objects.get(object_id)
+            astronomical_object = self.objects.get(object_id)
+            if astronomical_object is not None and options:
+                astronomical_object.object_type = self.object_types[
+                    astronomical_object.object_type_id
+                ]
+            return astronomical_object
         raise AssertionError(f"Unexpected model lookup: {model}")
 
     async def scalars(self, statement):

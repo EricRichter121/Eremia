@@ -44,7 +44,11 @@ async def create(
     session: AsyncSession, user_id: int, object_id: int
 ) -> Favorite:
     """Create a favorite owned by the authenticated user."""
-    astronomical_object = await session.get(AstronomicalObject, object_id)
+    astronomical_object = await session.get(
+        AstronomicalObject,
+        object_id,
+        options=(selectinload(AstronomicalObject.object_type),),
+    )
     if astronomical_object is None:
         raise AstronomicalObjectNotFoundError
 

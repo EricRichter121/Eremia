@@ -15,9 +15,12 @@ async def list_astronomical_objects(
 	object_type_id: int | None,
 	skip: int,
 	limit: int,
+	search: str | None = None,
 ) -> list[AstronomicalObject]:
 	"""Coordinate the list-object use case."""
-	return await service.list_all(session, object_type_id, skip, limit)
+	return await service.list_all(
+		session, object_type_id, skip, limit, search
+	)
 
 
 async def get_astronomical_object(

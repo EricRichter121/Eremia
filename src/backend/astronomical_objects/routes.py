@@ -26,10 +26,11 @@ async def list_astronomical_objects(
 	object_type_id: int | None = Query(default=None, ge=1),
 	skip: int = Query(default=0, ge=0),
 	limit: int = Query(default=100, ge=1, le=100),
+	search: str | None = Query(default=None),
 ):
 	"""Return a paginated list of astronomical objects."""
 	return await controller.list_astronomical_objects(
-		session, object_type_id, skip, limit
+		session, object_type_id, skip, limit, search
 	)
 
 

@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 from backend.astronomical_objects.models import AstronomicalObject
 from backend.astronomical_objects.schemas import AstronomicalObjectCreate
 from backend.database.errors import IntegrityConflictError, integrity_constraint_name
+from backend.object_types.models import ObjectType
 
 
 class AstronomicalObjectNotFoundError(Exception):
@@ -36,8 +37,9 @@ async def list_all(
 	object_type_id: int | None,
 	skip: int,
 	limit: int,
+	search: str | None = None,
 ) -> list[AstronomicalObject]:
-	"""Query objects in name order with optional type filtering and pagination."""
+	"""Query objects in name order with optional search, type filtering, and pagination."""
 	statement = (
 		select(AstronomicalObject)
 		.options(selectinload(AstronomicalObject.object_type))
@@ -48,6 +50,26 @@ async def list_all(
 	if object_type_id is not None:
 		statement = statement.where(
 			AstronomicalObject.object_type_id == object_type_id
+		)
+	search_term = search.strip() if search is not None else ""
+	if search_term:
+		escaped_search = (
+			search_term.replace("!", "!!").replace("%", "!%").replace("_", "!_")
+		)
+		search_pattern = f"%{escaped_search}%"
+		statement = statement.where(
+			or_(
+				AstronomicalObject.name.ilike(search_pattern, escape="!"),
+				AstronomicalObject.catalog_id.ilike(
+					search_pattern, escape="!"
+				),
+				AstronomicalObject.description.ilike(
+					search_pattern, escape="!"
+				),
+				AstronomicalObject.object_type.has(
+					ObjectType.name.ilike(search_pattern, escape="!")
+				),
+			)
 		)
 	result = await session.scalars(statement)
 	return list(result)
