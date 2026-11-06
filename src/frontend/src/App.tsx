@@ -4,6 +4,7 @@ import './App.css'
 import ObjectsPage from './pages/ObjectsPage'
 import FavoritesPage from './pages/FavoritesPage'
 import AstronomicalObjectPage from './pages/AstronomicalObjectPage'
+import HomePage from './pages/HomePage'
 import Header from './components/header'
 import SignInModal from './components/auth/SignInModal'
 
@@ -34,7 +35,8 @@ function App() {
             <FavoritesPage onRequestSignIn={() => setIsSignInOpen(true)} />
           }
         />
-        <Route path="/" element={<Navigate to="/objects" replace />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <SignInModal
         isOpen={isSignInOpen}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 import AstronomicalObjectCard from '../components/AstronomicalObjectCard'
 import AstronomicalObjectCardSkeleton from '../components/AstronomicalObjectCardSkeleton'
@@ -17,10 +18,26 @@ interface ObjectsPageProps {
   onRequestSignIn: () => void
 }
 
+function parseObjectTypeId(value: string | null): number | undefined {
+  if (!value || !/^\d+$/.test(value)) return undefined
+
+  const parsedValue = Number(value)
+  return Number.isSafeInteger(parsedValue) && parsedValue > 0
+    ? parsedValue
+    : undefined
+}
+
 function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
-  const [objectTypeId, setObjectTypeId] = useState<number | undefined>()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchTerm, setSearchTerm] = useState(
+    () => searchParams.get('search') ?? '',
+  )
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(
+    () => searchParams.get('search') ?? '',
+  )
+  const [objectTypeId, setObjectTypeId] = useState<number | undefined>(() =>
+    parseObjectTypeId(searchParams.get('type')),
+  )
   const [skip, setSkip] = useState(0)
   const {
     data: objectPage,
@@ -72,11 +89,31 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
   function updateSearchTerm(value: string) {
     setSearchTerm(value)
     setSkip(0)
+    setSearchParams((currentParams) => {
+      const nextParams = new URLSearchParams(currentParams)
+      const trimmedValue = value.trim()
+      if (trimmedValue) {
+        nextParams.set('search', trimmedValue)
+      } else {
+        nextParams.delete('search')
+      }
+      return nextParams
+    }, { replace: true })
   }
 
   function updateObjectType(value: string) {
-    setObjectTypeId(value ? Number(value) : undefined)
+    const parsedValue = parseObjectTypeId(value || null)
+    setObjectTypeId(parsedValue)
     setSkip(0)
+    setSearchParams((currentParams) => {
+      const nextParams = new URLSearchParams(currentParams)
+      if (parsedValue !== undefined) {
+        nextParams.set('type', String(parsedValue))
+      } else {
+        nextParams.delete('type')
+      }
+      return nextParams
+    }, { replace: true })
   }
 
   return (
@@ -129,6 +166,7 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
                     </option>
                   ))}
                 </select>
+                <span className="catalog-search__hint">For example: Star, Galaxy, Nebula</span>
               </label>
             </div>
             <div className="catalog__toolbar-status">
