@@ -17,11 +17,12 @@ function Header({ onRequestSignIn }: HeaderProps) {
   return (
     <header className="site-header">
       <div className="site-header__inner">
-        <Link className="wordmark" to="/objects" aria-label="Eremia catalog home">
+        <Link className="wordmark" to="/" aria-label="Eremia home">
           <span className="wordmark__mark" aria-hidden="true">E</span>
           EREMIA
         </Link>
         <nav className="site-header__navigation" aria-label="Main navigation">
+          <Link to="/">Home</Link>
           <Link to="/objects">Catalog</Link>
           {!isPending && !isError && user && (
             <Link to="/favorites">Favorites</Link>
