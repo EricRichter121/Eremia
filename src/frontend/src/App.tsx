@@ -6,6 +6,7 @@ import FavoritesPage from './pages/FavoritesPage'
 import AstronomicalObjectPage from './pages/AstronomicalObjectPage'
 import HomePage from './pages/HomePage'
 import Header from './components/header'
+import Footer from './components/Footer'
 import SignInModal from './components/auth/SignInModal'
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer />
       <SignInModal
         isOpen={isSignInOpen}
         onClose={() => setIsSignInOpen(false)}
