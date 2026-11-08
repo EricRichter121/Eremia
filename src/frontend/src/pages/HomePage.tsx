@@ -213,23 +213,6 @@ function HomePage() {
           </div>
         </section>
       </main>
-
-      <footer className="site-footer">
-        <div className="site-footer__inner">
-          <div>
-            <Link className="wordmark" to="/">
-              <span className="wordmark__mark" aria-hidden="true">E</span>
-              EREMIA
-            </Link>
-            <p>A scientific archive for discovering astronomical objects.</p>
-          </div>
-          <nav aria-label="Footer navigation">
-            <Link to="/">Home</Link>
-            <Link to="/objects">Catalog</Link>
-            <Link to="/favorites">Favorites</Link>
-          </nav>
-        </div>
-      </footer>
     </>
   )
 }
