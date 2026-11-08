@@ -5,7 +5,7 @@ import ObjectsPage from './pages/ObjectsPage'
 import FavoritesPage from './pages/FavoritesPage'
 import AstronomicalObjectPage from './pages/AstronomicalObjectPage'
 import HomePage from './pages/HomePage'
-import Header from './components/Header'
+import Header from './components/header'
 import Footer from './components/Footer'
 import SignInModal from './components/auth/SignInModal'
 
