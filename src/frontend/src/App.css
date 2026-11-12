@@ -756,11 +756,50 @@
 }
 
 .object-detail__catalog-id {
-  margin: 10px 0 0;
+  margin: 0;
   color: var(--color-text-secondary);
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   font-size: 12px;
   overflow-wrap: anywhere;
+}
+
+.object-detail__identifier {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.object-detail__copy-button {
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--shape-button);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  transition:
+    border-color var(--transition-interactive),
+    background var(--transition-interactive),
+    color var(--transition-interactive);
+}
+
+.object-detail__copy-button:hover {
+  border-color: var(--color-accent-primary);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+}
+
+.object-detail__copy-status {
+  color: var(--color-success);
+  font-size: 12px;
+}
+
+.object-detail__copy-status--error {
+  color: var(--color-error);
 }
 
 .object-detail__section {

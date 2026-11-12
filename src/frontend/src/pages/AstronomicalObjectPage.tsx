@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 
 import FavoriteButton from '../components/FavoriteButton'
@@ -35,6 +36,9 @@ function formatDiscoveryDate(value: string): string {
 function AstronomicalObjectPage({
   onRequestSignIn,
 }: AstronomicalObjectPageProps) {
+  const [copyStatus, setCopyStatus] = useState<
+    'idle' | 'copied' | 'error'
+  >('idle')
   const { objectId: objectIdParam } = useParams()
   const parsedObjectId = objectIdParam && /^\d+$/.test(objectIdParam)
     ? Number(objectIdParam)
@@ -68,6 +72,21 @@ function AstronomicalObjectPage({
   const isNotFound =
     objectId === undefined ||
     (axios.isAxiosError(error) && error.response?.status === 404)
+  const catalogId = object?.catalog_id
+
+  async function copyCatalogId(catalogId: string) {
+    setCopyStatus('idle')
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error('Clipboard access is unavailable.')
+      }
+
+      await navigator.clipboard.writeText(catalogId)
+      setCopyStatus('copied')
+    } catch {
+      setCopyStatus('error')
+    }
+  }
 
   return (
     <main className="catalog">
@@ -158,9 +177,31 @@ function AstronomicalObjectPage({
             <div>
               <p className="eyebrow">{object.object_type.name}</p>
               <h1>{object.name}</h1>
-              <p className="object-detail__catalog-id">
-                {object.catalog_id ?? 'Identifier unavailable'}
-              </p>
+              <div className="object-detail__identifier">
+                <p className="object-detail__catalog-id">
+                  {catalogId ?? 'Identifier unavailable'}
+                </p>
+                {catalogId && (
+                  <button
+                    className="object-detail__copy-button"
+                    type="button"
+                    aria-label={`Copy ${object.name} identifier`}
+                    onClick={() => void copyCatalogId(catalogId)}
+                  >
+                    Copy
+                  </button>
+                )}
+                <span
+                  className={`object-detail__copy-status${copyStatus === 'error' ? ' object-detail__copy-status--error' : ''}`}
+                  aria-live="polite"
+                >
+                  {copyStatus === 'copied'
+                    ? 'Copied'
+                    : copyStatus === 'error'
+                      ? 'Unable to copy'
+                      : ''}
+                </span>
+              </div>
             </div>
             <FavoriteButton
               isFavorite={isFavorite}
