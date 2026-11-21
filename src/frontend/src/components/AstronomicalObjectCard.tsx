@@ -8,8 +8,8 @@ interface AstronomicalObjectCardProps {
   canManageFavorites: boolean
   favoritesLoading: boolean
   mutationPending: boolean
-  onAddFavorite: (objectId: number) => void
-  onRemoveFavorite: (objectId: number) => void
+  onAddFavorite: (objectId: number) => Promise<void>
+  onRemoveFavorite: (objectId: number) => Promise<void>
   onRequestSignIn: () => void
 }
 

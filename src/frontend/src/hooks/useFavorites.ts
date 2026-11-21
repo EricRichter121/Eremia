@@ -67,7 +67,7 @@ export function useFavoriteMutations() {
     mutationKey: addFavoriteMutationKey,
     mutationFn: createFavorite,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: favoritesQueryKey })
+      return queryClient.invalidateQueries({ queryKey: favoritesQueryKey })
     },
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -76,7 +76,7 @@ export function useFavoriteMutations() {
         axios.isAxiosError(error) &&
         (error.response?.status === 404 || error.response?.status === 409)
       ) {
-        void queryClient.invalidateQueries({ queryKey: favoritesQueryKey })
+        return queryClient.invalidateQueries({ queryKey: favoritesQueryKey })
       }
     },
   })
@@ -85,7 +85,7 @@ export function useFavoriteMutations() {
     mutationKey: removeFavoriteMutationKey,
     mutationFn: deleteFavorite,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: favoritesQueryKey })
+      return queryClient.invalidateQueries({ queryKey: favoritesQueryKey })
     },
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -94,7 +94,7 @@ export function useFavoriteMutations() {
         axios.isAxiosError(error) &&
         (error.response?.status === 404 || error.response?.status === 409)
       ) {
-        void queryClient.invalidateQueries({ queryKey: favoritesQueryKey })
+        return queryClient.invalidateQueries({ queryKey: favoritesQueryKey })
       }
     },
   })
@@ -109,13 +109,19 @@ export function useFavoriteMutations() {
   return {
     addFavorite: (objectId: number) => {
       if (user && !isAddingFavorite) {
-        addMutation.mutate({ astronomical_object_id: objectId })
+        return addMutation
+          .mutateAsync({ astronomical_object_id: objectId })
+          .then(() => undefined, () => undefined)
       }
+      return Promise.resolve()
     },
     removeFavorite: (objectId: number) => {
       if (user && !isRemovingFavorite) {
-        removeMutation.mutate(objectId)
+        return removeMutation
+          .mutateAsync(objectId)
+          .then(() => undefined, () => undefined)
       }
+      return Promise.resolve()
     },
     isPending: isAddingFavorite || isRemovingFavorite,
     error: addMutation.error ?? removeMutation.error,
