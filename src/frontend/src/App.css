@@ -889,6 +889,26 @@
   line-height: 1;
 }
 
+.favorite-button__icon--adding {
+  animation: favorite-add 220ms ease-out;
+}
+
+.favorite-button__icon--removing {
+  animation: favorite-remove 180ms ease-in-out;
+}
+
+@keyframes favorite-add {
+  45% {
+    transform: scale(1.2) rotate(7deg);
+  }
+}
+
+@keyframes favorite-remove {
+  45% {
+    transform: scale(0.82) rotate(-6deg);
+  }
+}
+
 .favorite-button:hover:not(:disabled) {
   border-color: var(--color-border);
   background: var(--color-surface-elevated);
