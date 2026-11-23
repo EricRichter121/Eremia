@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useLocation, useParams, Link } from 'react-router-dom'
 
 import FavoriteButton from '../components/FavoriteButton'
 import Skeleton from '../components/Skeleton'
@@ -33,12 +33,39 @@ function formatDiscoveryDate(value: string): string {
   }).format(new Date(value))
 }
 
+function getReturnLocation(state: unknown) {
+  if (typeof state !== 'object' || state === null || !('from' in state)) {
+    return { pathname: '/objects', search: '', hash: '' }
+  }
+
+  const from = state.from
+  if (typeof from !== 'object' || from === null || !('pathname' in from)) {
+    return { pathname: '/objects', search: '', hash: '' }
+  }
+
+  if (from.pathname !== '/objects' && from.pathname !== '/favorites') {
+    return { pathname: '/objects', search: '', hash: '' }
+  }
+
+  return {
+    pathname: from.pathname,
+    search: 'search' in from && typeof from.search === 'string' ? from.search : '',
+    hash: 'hash' in from && typeof from.hash === 'string' ? from.hash : '',
+  }
+}
+
 function AstronomicalObjectPage({
   onRequestSignIn,
 }: AstronomicalObjectPageProps) {
   const [copyStatus, setCopyStatus] = useState<
     'idle' | 'copied' | 'error'
   >('idle')
+  const location = useLocation()
+  const returnLocation = getReturnLocation(location.state)
+  const returnLabel =
+    returnLocation.pathname === '/favorites'
+      ? 'Back to favorites'
+      : 'Back to catalog'
   const { objectId: objectIdParam } = useParams()
   const parsedObjectId = objectIdParam && /^\d+$/.test(objectIdParam)
     ? Number(objectIdParam)
@@ -90,8 +117,8 @@ function AstronomicalObjectPage({
 
   return (
     <main className="catalog">
-      <Link className="object-detail__back" to="/objects">
-        Back to catalog
+      <Link className="object-detail__back" to={returnLocation}>
+        {returnLabel}
       </Link>
 
       {objectId !== undefined && isPending && (

@@ -27,6 +27,15 @@ function parseObjectTypeId(value: string | null): number | undefined {
     : undefined
 }
 
+function parseSkip(value: string | null): number {
+  if (!value || !/^\d+$/.test(value)) return 0
+
+  const parsedValue = Number(value)
+  return Number.isSafeInteger(parsedValue) && parsedValue >= 0
+    ? parsedValue
+    : 0
+}
+
 function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState(
@@ -38,7 +47,7 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
   const [objectTypeId, setObjectTypeId] = useState<number | undefined>(() =>
     parseObjectTypeId(searchParams.get('type')),
   )
-  const [skip, setSkip] = useState(0)
+  const [skip, setSkip] = useState(() => parseSkip(searchParams.get('skip')))
   const {
     data: objectPage,
     error,
@@ -97,6 +106,7 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
       } else {
         nextParams.delete('search')
       }
+      nextParams.delete('skip')
       return nextParams
     }, { replace: true })
   }
@@ -111,6 +121,20 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
         nextParams.set('type', String(parsedValue))
       } else {
         nextParams.delete('type')
+      }
+      nextParams.delete('skip')
+      return nextParams
+    }, { replace: true })
+  }
+
+  function updateSkip(nextSkip: number) {
+    setSkip(nextSkip)
+    setSearchParams((currentParams) => {
+      const nextParams = new URLSearchParams(currentParams)
+      if (nextSkip > 0) {
+        nextParams.set('skip', String(nextSkip))
+      } else {
+        nextParams.delete('skip')
       }
       return nextParams
     }, { replace: true })
@@ -271,8 +295,8 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
               type="button"
               disabled={skip === 0 || isFetching || isPlaceholderData}
               onClick={() =>
-                setSkip((currentSkip) =>
-                  Math.max(0, currentSkip - ASTRONOMICAL_OBJECTS_PAGE_SIZE),
+                updateSkip(
+                  Math.max(0, skip - ASTRONOMICAL_OBJECTS_PAGE_SIZE),
                 )
               }
             >
@@ -286,7 +310,7 @@ function ObjectsPage({ onRequestSignIn }: ObjectsPageProps) {
               type="button"
               disabled={!objectPage.hasNextPage || isFetching || isPlaceholderData}
               onClick={() =>
-                setSkip((currentSkip) => currentSkip + ASTRONOMICAL_OBJECTS_PAGE_SIZE)
+                updateSkip(skip + ASTRONOMICAL_OBJECTS_PAGE_SIZE)
               }
             >
               Next
