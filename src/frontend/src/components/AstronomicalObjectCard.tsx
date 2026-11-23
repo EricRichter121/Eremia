@@ -1,5 +1,5 @@
 import type { AstronomicalObject } from '../types/astronomicalObject'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import FavoriteButton from './FavoriteButton'
 
 interface AstronomicalObjectCardProps {
@@ -30,11 +30,24 @@ function AstronomicalObjectCard({
   onRemoveFavorite,
   onRequestSignIn,
 }: AstronomicalObjectCardProps) {
+  const location = useLocation()
+  const navigationState = {
+    from: {
+      pathname: location.pathname,
+      search: location.search,
+      hash: location.hash,
+    },
+  }
+
   return (
     <article className="object-card">
       <p className="object-card__type">{object.object_type.name}</p>
       <h2>
-        <Link className="object-card__title-link" to={`/objects/${object.id}`}>
+        <Link
+          className="object-card__title-link"
+          to={`/objects/${object.id}`}
+          state={navigationState}
+        >
           {object.name}
         </Link>
       </h2>
@@ -61,7 +74,11 @@ function AstronomicalObjectCard({
         </div>
       </dl>
       <div className="object-card__actions">
-        <Link className="object-card__details-link" to={`/objects/${object.id}`}>
+        <Link
+          className="object-card__details-link"
+          to={`/objects/${object.id}`}
+          state={navigationState}
+        >
           View details
         </Link>
         <FavoriteButton
