@@ -60,6 +60,9 @@ function AstronomicalObjectPage({
   const [copyStatus, setCopyStatus] = useState<
     'idle' | 'copied' | 'error'
   >('idle')
+  const [copyLinkStatus, setCopyLinkStatus] = useState<
+    'idle' | 'copied' | 'error'
+  >('idle')
   const location = useLocation()
   const returnLocation = getReturnLocation(location.state)
   const returnLabel =
@@ -112,6 +115,20 @@ function AstronomicalObjectPage({
       setCopyStatus('copied')
     } catch {
       setCopyStatus('error')
+    }
+  }
+
+  async function copyPageUrl() {
+    setCopyLinkStatus('idle')
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error('Clipboard access is unavailable.')
+      }
+
+      await navigator.clipboard.writeText(window.location.href)
+      setCopyLinkStatus('copied')
+    } catch {
+      setCopyLinkStatus('error')
     }
   }
 
@@ -218,6 +235,14 @@ function AstronomicalObjectPage({
                     Copy
                   </button>
                 )}
+                <button
+                  className="object-detail__copy-button"
+                  type="button"
+                  aria-label={`Copy link to ${object.name}`}
+                  onClick={() => void copyPageUrl()}
+                >
+                  Copy link
+                </button>
                 <span
                   className={`object-detail__copy-status${copyStatus === 'error' ? ' object-detail__copy-status--error' : ''}`}
                   aria-live="polite"
@@ -226,6 +251,17 @@ function AstronomicalObjectPage({
                     ? 'Copied'
                     : copyStatus === 'error'
                       ? 'Unable to copy'
+                      : ''}
+                </span>
+                <span
+                  className={`object-detail__copy-status${copyLinkStatus === 'error' ? ' object-detail__copy-status--error' : ''}`}
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {copyLinkStatus === 'copied'
+                    ? 'Link copied'
+                    : copyLinkStatus === 'error'
+                      ? 'Unable to copy link'
                       : ''}
                 </span>
               </div>
